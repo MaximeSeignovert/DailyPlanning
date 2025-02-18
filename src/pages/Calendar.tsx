@@ -89,17 +89,17 @@ export function Calendar() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-[380px_1fr] gap-8">
-        <Card>
+      <div className="flex flex-col md:flex-row gap-8">
+        <Card className="w-full md:w-auto">
           <CardHeader>
             <CardTitle>Calendrier</CardTitle>
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-[350px] w-full" />
+            <Skeleton className="h-[350px] w-[320px]" />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="w-full md:flex-1">
           <CardHeader>
             <Skeleton className="h-7 w-48" />
           </CardHeader>
@@ -117,8 +117,8 @@ export function Calendar() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[380px_1fr] gap-8">
-      <Card>
+    <div className="flex flex-col md:flex-row gap-8">
+      <Card className="w-full md:w-auto h-min">
         <CardHeader>
           <CardTitle>Calendrier</CardTitle>
         </CardHeader>
@@ -141,7 +141,7 @@ export function Calendar() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="w-full md:flex-1 h-min">
         <CardHeader>
           <CardTitle>
             Activités du {selectedDate && format(selectedDate, 'dd MMMM yyyy', { locale: fr })}
@@ -156,16 +156,13 @@ export function Calendar() {
               <Skeleton className="h-12 w-full" />
             </div>
           ) : (
-            <ScrollArea className="h-[600px] pr-4">
+            <ScrollArea className="h-[300px] border p-4 rounded-md pr-4">
               {activities.length === 0 ? (
                 <p className="text-muted-foreground">Aucune activité pour cette date</p>
               ) : (
                 <div className="space-y-6">
                   {activities.map((activity) => (
                     <div key={activity.id}>
-                      <div className="text-sm text-muted-foreground mb-2">
-                        {format(new Date(activity.date), 'HH:mm')}
-                      </div>
                       <div className="prose prose-sm dark:prose-invert">
                         <ReactMarkdown>{activity.content}</ReactMarkdown>
                       </div>

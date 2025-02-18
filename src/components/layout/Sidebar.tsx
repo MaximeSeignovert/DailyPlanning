@@ -50,11 +50,7 @@ export function Sidebar() {
         </ScrollArea>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{
-          name: "Utilisateur",
-          email: "user@example.com",
-          avatar: "/avatar.png"
-        }} />
+        <NavUser />
       </SidebarFooter>
     </SidebarRoot>
   );

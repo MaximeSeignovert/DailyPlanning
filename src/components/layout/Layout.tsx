@@ -33,7 +33,7 @@ export function Layout() {
         <Sidebar />
         <div className="flex-1">
           <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
+            <header className="flex h-16 shrink-0 items-center justify-between px-4">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 <span className="text-lg font-semibold">{getPageTitle()}</span>
