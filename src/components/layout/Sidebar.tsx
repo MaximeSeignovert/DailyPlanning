@@ -1,67 +1,61 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   BookOpen, 
   Calendar, 
   LayoutDashboard, 
-  LogOut, 
   Settings, 
-  LineChart 
+  LineChart,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { cn } from '@/lib/utils';
+import {
+  Sidebar as SidebarRoot,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+} from "@/components/ui/sidebar";
+import { NavUser } from '@/components/sidebar/nav-user';
 
 export function Sidebar() {
   const location = useLocation();
   
   const links = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
     { href: '/journal', label: 'Journal', icon: BookOpen },
-    { href: '/calendar', label: 'Calendar', icon: Calendar },
-    { href: '/analytics', label: 'Analytics', icon: LineChart },
-    { href: '/settings', label: 'Settings', icon: Settings },
+    { href: '/calendar', label: 'Calendrier', icon: Calendar },
+    { href: '/analytics', label: 'Analytique', icon: LineChart },
+    { href: '/settings', label: 'Paramètres', icon: Settings },
   ];
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   return (
-    <div className="flex h-screen flex-col border-r bg-muted/10">
-      <div className="p-6">
-        <h2 className="text-lg font-semibold">Daily Manager</h2>
-      </div>
-      <ScrollArea className="flex-1 px-4">
-        <div className="space-y-2">
-          {links.map(({ href, label, icon: Icon }) => (
-            <Button
-              key={href}
-              variant={location.pathname === href ? "secondary" : "ghost"}
-              className={cn(
-                "w-full justify-start",
-                location.pathname === href && "bg-secondary"
-              )}
-              asChild
-            >
-              <Link to={href}>
-                <Icon className="mr-2 h-4 w-4" />
-                {label}
-              </Link>
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
-      <div className="p-4 border-t">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-muted-foreground"
-          onClick={handleSignOut}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
-        </Button>
-      </div>
-    </div>
+    <SidebarRoot variant="inset">
+      <SidebarContent>
+        <ScrollArea className="flex-1">
+          <SidebarMenu>
+            {links.map(({ href, label, icon: Icon }) => (
+              <SidebarMenuItem key={href}>
+                <SidebarMenuButton
+                  asChild
+                  data-active={location.pathname === href}
+                >
+                  <Link to={href} className="no-underline text-inherit">
+                    <Icon className="mr-2 h-4 w-4" />
+                    {label}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </ScrollArea>
+      </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={{
+          name: "Utilisateur",
+          email: "user@example.com",
+          avatar: "/avatar.png"
+        }} />
+      </SidebarFooter>
+    </SidebarRoot>
   );
 }

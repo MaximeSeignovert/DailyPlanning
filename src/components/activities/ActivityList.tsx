@@ -11,8 +11,12 @@ interface Activity {
   date: string;
 }
 
+interface GroupedActivities {
+  [date: string]: Activity[];
+}
+
 export function ActivityList() {
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -26,11 +30,21 @@ export function ActivityList() {
         .order('date', { ascending: false });
 
       if (error) {
-        console.error('Error:', error);
+        console.error('Erreur:', error);
         return;
       }
 
-      setActivities(data);
+      // Grouper les activités par date
+      const grouped = (data || []).reduce((acc: GroupedActivities, activity) => {
+        const dateKey = format(new Date(activity.date), 'yyyy-MM-dd');
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(activity);
+        return acc;
+      }, {});
+
+      setGroupedActivities(grouped);
     };
 
     fetchActivities();
@@ -39,17 +53,21 @@ export function ActivityList() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Previous Activities</CardTitle>
+        <CardTitle>Activités Précédentes</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[500px] pr-4">
-          {activities.map((activity) => (
-            <div key={activity.id} className="mb-6">
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">
-                {format(new Date(activity.date), 'MMMM d, yyyy')}
+          {Object.entries(groupedActivities).map(([date, activities]) => (
+            <div key={date} className="mb-8">
+              <h3 className="text-sm font-medium text-muted-foreground mb-4">
+                {format(new Date(date), 'MMMM d, yyyy')}
               </h3>
-              <div className="prose prose-sm dark:prose-invert">
-                <ReactMarkdown>{activity.content}</ReactMarkdown>
+              <div className="space-y-4">
+                {activities.map((activity) => (
+                  <div key={activity.id} className="prose prose-sm dark:prose-invert">
+                    <ReactMarkdown>{activity.content}</ReactMarkdown>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
