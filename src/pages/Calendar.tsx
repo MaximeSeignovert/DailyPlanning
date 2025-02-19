@@ -157,7 +157,7 @@ export function Calendar() {
             </div>
           ) : (
             <ScrollArea className="h-[300px] border p-4 rounded-md pr-4">
-              {activities.length === 0 ? (
+              {activities.length === 0 || activities.every(activity => activity.content === "") ? (
                 <p className="text-muted-foreground">Aucune activité pour cette date</p>
               ) : (
                 <div className="space-y-6">

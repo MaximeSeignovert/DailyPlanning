@@ -188,8 +188,8 @@ export function Analytics() {
           </CardContent>
         </Card>
       </div>
-
-      <Card>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<Card>
         <CardHeader>
           <CardTitle>Évolution des activités</CardTitle>
           <CardDescription>
@@ -227,7 +227,7 @@ export function Analytics() {
                 }}
               />
               <Line
-                type="linear"
+                type="step"
                 dataKey="count"
                 stroke="var(--color-activities)"
                 strokeWidth={2}
@@ -254,6 +254,15 @@ export function Analytics() {
           </div>
         </CardFooter>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            A venir ...
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    </div>
+      
     </div>
   );
 } 
