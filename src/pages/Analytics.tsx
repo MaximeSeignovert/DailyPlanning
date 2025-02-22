@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { supabase } from '@/lib/supabase';
 import { Skeleton } from "@/components/ui/skeleton";
-import { LineChart, Line, XAxis, CartesianGrid } from 'recharts';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LineChart, Line, XAxis, CartesianGrid, Tooltip } from 'recharts';
+import { ChartConfig, ChartContainer} from "@/components/ui/chart";
+import { TrendingUp, TrendingDown } from "lucide-react"
 
 interface ActivityStats {
-  totalActivities: number;
-  lastWeekActivities: number;
+  totalDays: number;
+  lastWeekDays: number;
   averageWordsPerDay: number;
   streakDays: number;
 }
@@ -23,24 +23,26 @@ interface Activity {
 }
 
 const chartConfig = {
-  activities: {
-    label: "Activités",
-    theme: {
-      light: "hsl(var(--primary))",
-      dark: "hsl(var(--primary))",
-    },
+  activity: {
+    label: "Activité",
+    color: "hsl(var(--chart-1))",
+  },
+  words: {
+    label: "Mots",
+    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
 export function Analytics() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<ActivityStats>({
-    totalActivities: 0,
-    lastWeekActivities: 0,
+    totalDays: 0,
+    lastWeekDays: 0,
     averageWordsPerDay: 0,
     streakDays: 0,
   });
-  const [chartData, setChartData] = useState<{ date: string; count: number }[]>([]);
+  const [chartData, setChartData] = useState<{ date: string; hasActivity: number }[]>([]);
+  const [wordCountTrend, setWordCountTrend] = useState<Array<{ date: string; wordCount: number }>>([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -68,19 +70,34 @@ export function Analytics() {
         const uniqueDays = new Set(activities?.map(a => 
           format(new Date(a.date), 'yyyy-MM-dd')));
 
-        // Préparer les données pour le graphique
+        // Préparer les données pour le graphique d'activités
         const last7Days = Array.from({ length: 7 }, (_, i) => {
           const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
-          const count = activities?.filter(a => 
+          const hasActivity = activities?.some(a => 
             format(new Date(a.date), 'yyyy-MM-dd') === date
-          ).length || 0;
-          return { date, count };
+          ) ? 1 : 0;
+          return { date, hasActivity };
+        }).reverse();
+
+        // Calculer la tendance du nombre de mots sur 30 jours
+        const last30Days = Array.from({ length: 30 }, (_, i) => {
+          const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
+          const activity = activities?.find(a => 
+            format(new Date(a.date), 'yyyy-MM-dd') === date
+          );
+          return {
+            date,
+            wordCount: activity?.content?.split(/\s+/).length || 0
+          };
         }).reverse();
 
         setChartData(last7Days);
+        setWordCountTrend(last30Days);
         setStats({
-          totalActivities: activities?.length || 0,
-          lastWeekActivities: lastWeekActivities?.length || 0,
+          totalDays: uniqueDays.size,
+          lastWeekDays: new Set(lastWeekActivities?.map(a => 
+            format(new Date(a.date), 'yyyy-MM-dd')
+          )).size,
           averageWordsPerDay: Math.round(totalWords / uniqueDays.size) || 0,
           streakDays: calculateStreak(activities || []),
         });
@@ -119,10 +136,9 @@ export function Analytics() {
 
   const calculateTrend = () => {
     if (chartData.length < 2) return 0;
-    const lastDay = chartData[chartData.length - 1].count;
-    const previousDay = chartData[chartData.length - 2].count;
-    if (previousDay === 0) return lastDay > 0 ? 100 : 0;
-    return ((lastDay - previousDay) / previousDay) * 100;
+    const lastDay = chartData[chartData.length - 1].hasActivity;
+    const previousDay = chartData[chartData.length - 2].hasActivity;
+    return lastDay - previousDay;
   };
 
   if (loading) {
@@ -147,22 +163,22 @@ export function Analytics() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total des activités
+              Jours d'activité
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalActivities}</div>
+            <div className="text-2xl font-bold">{stats.totalDays}</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Activités (7 derniers jours)
+              Jours actifs (7 derniers jours)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.lastWeekActivities}</div>
+            <div className="text-2xl font-bold">{stats.lastWeekDays}</div>
           </CardContent>
         </Card>
 
@@ -188,81 +204,140 @@ export function Analytics() {
           </CardContent>
         </Card>
       </div>
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-<Card>
-        <CardHeader>
-          <CardTitle>Évolution des activités</CardTitle>
-          <CardDescription>
-            {format(subDays(new Date(), 6), 'dd MMMM', { locale: fr })} - {format(new Date(), 'dd MMMM yyyy', { locale: fr })}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig}>
-            <LineChart
-              data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(date) => format(new Date(date), 'dd/MM', { locale: fr })}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={({ active, payload, label }) => {
-                  if (!active || !payload?.length) return null;
-                  return (
-                    <ChartTooltipContent
-                      label={format(new Date(label), 'dd MMMM yyyy', { locale: fr })}
-                      payload={payload}
-                      formatter={(value) => [`${value} activité${Number(value) > 1 ? 's' : ''}`]}
-                    />
-                  );
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Évolution des activités</CardTitle>
+            <CardDescription>
+              {format(subDays(new Date(), 6), 'dd MMMM', { locale: fr })} - {format(new Date(), 'dd MMMM yyyy', { locale: fr })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig}>
+              <LineChart
+                accessibilityLayer
+                data={chartData}
+                margin={{
+                  left: 12,
+                  right: 12,
                 }}
-              />
-              <Line
-                type="step"
-                dataKey="count"
-                stroke="var(--color-activities)"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ChartContainer>
-        </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            {trend !== 0 && (
-              <>
-                {trend > 0 ? 'Augmentation' : 'Diminution'} de {Math.abs(trend).toFixed(1)}% 
-                {trend > 0 ? (
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-red-500" />
-                )}
-              </>
-            )}
-          </div>
-          <div className="leading-none text-muted-foreground">
-            Affichage des activités sur les 7 derniers jours
-          </div>
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            A venir ...
-          </CardTitle>
-        </CardHeader>
-      </Card>
-    </div>
-      
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(date) => format(new Date(date), 'dd/MM', { locale: fr })}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null;
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="font-medium">
+                          {format(new Date(label), 'EEEE dd MMMM yyyy', { locale: fr })}
+                        </div>
+                        <div className="mt-1">
+                          <span>Statut : </span>
+                          <span className="font-medium">
+                            {payload[0].value ? 'Actif' : 'Inactif'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+                <Line
+                  type="stepAfter"
+                  dataKey="hasActivity"
+                  stroke="var(--color-activity)"
+                  strokeWidth={2}
+                  dot={{ stroke: 'var(--color-activity)', fill: 'var(--background)' }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+          <CardFooter className="flex-col items-start gap-2 text-sm">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              {trend !== 0 && (
+                <>
+                  {trend > 0 ? (
+                    <>
+                      Tendance à la hausse <TrendingUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Tendance à la baisse <TrendingDown className="h-4 w-4" />
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="leading-none text-muted-foreground">
+              Affichage des activités sur les 7 derniers jours
+            </div>
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendance de la longueur des entrées</CardTitle>
+            <CardDescription>Évolution du nombre de mots sur 30 jours</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig}>
+              <LineChart
+                accessibilityLayer
+                data={wordCountTrend}
+                margin={{
+                  left: 12,
+                  right: 12,
+                }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(date) => format(new Date(date), 'dd/MM', { locale: fr })}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null;
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="font-medium">
+                          {format(new Date(label), 'EEEE dd MMMM yyyy', { locale: fr })}
+                        </div>
+                        <div className="mt-1">
+                          <span>Nombre de mots : </span>
+                          <span className="font-medium">
+                            {payload[0].value}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="wordCount"
+                  stroke="var(--color-words)"
+                  strokeWidth={2}
+                  dot={{ stroke: 'var(--color-words)', fill: 'var(--background)' }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+          <CardFooter className="flex-col items-start gap-2 text-sm">
+            <div className="leading-none text-muted-foreground">
+              Évolution de la quantité de contenu sur les 30 derniers jours
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 } 
