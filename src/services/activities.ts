@@ -88,4 +88,23 @@ export async function getAllActivitiesWithDates() {
 
   if (error) throw error;
   return data?.filter(activity => activity.content?.trim().length > 0) || [];
+}
+
+export async function getLastActivity() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('user_id', user.id)
+    .lt('date', today.toISOString())
+    .order('date', { ascending: false })
+    .limit(1);
+
+  if (error) throw error;
+  return data?.[0] || null;
 } 

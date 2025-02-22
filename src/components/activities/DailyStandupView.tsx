@@ -1,31 +1,30 @@
 import { useEffect, useState } from 'react';
-import { subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { ActivityEditor } from "@/components/activities/ActivityEditor";
-import { getActivity, Activity } from '@/services/activities';
+import { getActivity, getLastActivity, Activity } from '@/services/activities';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 export function DailyStandupView() {
   const [todayContent, setTodayContent] = useState('');
-  const [yesterdayActivities, setYesterdayActivities] = useState<Activity[]>([]);
+  const [lastActivity, setLastActivity] = useState<Activity | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   const fetchActivities = async () => {
     try {
       const today = new Date();
-      const yesterday = subDays(today, 1);
-
-      const [todayActivities, yesterdayActs] = await Promise.all([
+      const [todayActivities, lastAct] = await Promise.all([
         getActivity(today),
-        getActivity(yesterday)
+        getLastActivity()
       ]);
 
       if (todayActivities && todayActivities.length > 0) {
         setTodayContent(todayActivities[0].content);
       }
-      setYesterdayActivities(yesterdayActs || []);
+      setLastActivity(lastAct);
     } catch (error) {
       console.error('Erreur:', error);
     }
@@ -39,21 +38,19 @@ export function DailyStandupView() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <Card>
         <CardHeader>
-          <CardTitle>📄 Activités d'hier</CardTitle>
+          <CardTitle>📄 Dernière activité <span className="italic text-muted-foreground">du {format(new Date(lastActivity?.date || new Date()), 'EEEE d MMMM yyyy', { locale: fr })}</span></CardTitle>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[400px] pr-4">
-            {yesterdayActivities.length === 0 ? (
+            {!lastActivity ? (
               <p className="text-muted-foreground text-center">
-                Aucune activité enregistrée hier
+                Aucune activité précédente
               </p>
             ) : (
               <div className="space-y-4">
-                {yesterdayActivities.map((activity) => (
-                  <div key={activity.id} className="prose prose-sm dark:prose-invert">
-                    <ReactMarkdown>{activity.content}</ReactMarkdown>
-                  </div>
-                ))}
+                <div className="prose prose-sm dark:prose-invert">
+                  <ReactMarkdown>{lastActivity.content}</ReactMarkdown>
+                </div>
               </div>
             )}
           </ScrollArea>
@@ -61,7 +58,7 @@ export function DailyStandupView() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Aujourd'hui</CardTitle>
+          <CardTitle>✍️ Aujourd'hui</CardTitle>
           <CardDescription>
             Qu'avez-vous prévu de faire aujourd'hui ?
           </CardDescription>
