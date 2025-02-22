@@ -12,9 +12,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-  server: {
-    historyApiFallback: true,
-  },
   build: {
     rollupOptions: {
       output: {
