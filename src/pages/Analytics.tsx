@@ -58,22 +58,27 @@ export function Analytics() {
 
         if (error) throw error;
 
+        // Filtrer les activités vides
+        const nonEmptyActivities = activities?.filter(activity => 
+          activity.content?.trim().length > 0
+        ) || [];
+
         // Calculer les statistiques
         const lastWeekDate = subDays(new Date(), 7);
-        const lastWeekActivities = activities?.filter(
+        const lastWeekActivities = nonEmptyActivities.filter(
           activity => new Date(activity.date) >= lastWeekDate
         );
 
         // Calculer la moyenne de mots par jour
-        const totalWords = activities?.reduce((acc, activity) => 
+        const totalWords = nonEmptyActivities.reduce((acc, activity) => 
           acc + (activity.content?.split(/\s+/).length || 0), 0);
-        const uniqueDays = new Set(activities?.map(a => 
+        const uniqueDays = new Set(nonEmptyActivities.map(a => 
           format(new Date(a.date), 'yyyy-MM-dd')));
 
         // Préparer les données pour le graphique d'activités
         const last7Days = Array.from({ length: 7 }, (_, i) => {
           const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
-          const hasActivity = activities?.some(a => 
+          const hasActivity = nonEmptyActivities.some(a => 
             format(new Date(a.date), 'yyyy-MM-dd') === date
           ) ? 1 : 0;
           return { date, hasActivity };
@@ -82,7 +87,7 @@ export function Analytics() {
         // Calculer la tendance du nombre de mots sur 30 jours
         const last30Days = Array.from({ length: 30 }, (_, i) => {
           const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
-          const activity = activities?.find(a => 
+          const activity = nonEmptyActivities.find(a => 
             format(new Date(a.date), 'yyyy-MM-dd') === date
           );
           return {
@@ -95,11 +100,11 @@ export function Analytics() {
         setWordCountTrend(last30Days);
         setStats({
           totalDays: uniqueDays.size,
-          lastWeekDays: new Set(lastWeekActivities?.map(a => 
+          lastWeekDays: new Set(lastWeekActivities.map(a => 
             format(new Date(a.date), 'yyyy-MM-dd')
           )).size,
           averageWordsPerDay: Math.round(totalWords / uniqueDays.size) || 0,
-          streakDays: calculateStreak(activities || []),
+          streakDays: calculateStreak(nonEmptyActivities),
         });
       } catch (error) {
         console.error('Erreur:', error);
@@ -114,7 +119,9 @@ export function Analytics() {
   const calculateStreak = (activities: Activity[]) => {
     if (!activities.length) return 0;
     
-    const dates = activities.map(a => format(new Date(a.date), 'yyyy-MM-dd'))
+    const dates = activities
+      .filter(activity => activity.content?.trim().length > 0)
+      .map(a => format(new Date(a.date), 'yyyy-MM-dd'))
       .sort()
       .reverse();
     

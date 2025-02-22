@@ -3,17 +3,11 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from '@/lib/supabase';
 import ReactMarkdown from 'react-markdown';
-
-interface Activity {
-  id: string;
-  content: string;
-  date: string;
-}
+import { getAllActivitiesWithDates, Activity } from '@/services/activities';
 
 interface GroupedActivities {
-  [date: string]: Activity[];
+  [key: string]: Activity[];
 }
 
 export function ActivityList() {
@@ -21,31 +15,20 @@ export function ActivityList() {
 
   useEffect(() => {
     const fetchActivities = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('activities')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false });
-
-      if (error) {
+      try {
+        const activities = await getAllActivitiesWithDates();
+        const grouped = activities.reduce((acc: GroupedActivities, activity) => {
+          const date = format(new Date(activity.date), 'yyyy-MM-dd');
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push(activity);
+          return acc;
+        }, {});
+        setGroupedActivities(grouped);
+      } catch (error) {
         console.error('Erreur:', error);
-        return;
       }
-
-      // Grouper les activités par date
-      const grouped = (data || []).reduce((acc: GroupedActivities, activity) => {
-        const dateKey = format(new Date(activity.date), 'yyyy-MM-dd');
-        if (!acc[dateKey]) {
-          acc[dateKey] = [];
-        }
-        acc[dateKey].push(activity);
-        return acc;
-      }, {});
-
-      setGroupedActivities(grouped);
     };
 
     fetchActivities();
