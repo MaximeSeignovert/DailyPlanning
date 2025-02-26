@@ -12,6 +12,7 @@ export function DailyStandupView() {
   const [todayContent, setTodayContent] = useState('');
   const [lastActivity, setLastActivity] = useState<Activity | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingLastActivity, setIsEditingLastActivity] = useState(false);
 
   const fetchActivities = async () => {
     try {
@@ -46,11 +47,25 @@ export function DailyStandupView() {
               <p className="text-muted-foreground text-center">
                 Aucune activité précédente
               </p>
+            ) : isEditingLastActivity ? (
+              <ActivityEditor
+                initialContent={lastActivity.content}
+                date={new Date(lastActivity.date)}
+                onSave={(content) => {
+                  setIsEditingLastActivity(false);
+                  setLastActivity({ ...lastActivity, content });
+                  fetchActivities();
+                }}
+                onCancel={() => setIsEditingLastActivity(false)}
+              />
             ) : (
               <div className="space-y-4">
                 <div className="prose prose-sm dark:prose-invert">
                   <ReactMarkdown>{lastActivity.content}</ReactMarkdown>
                 </div>
+                <Button variant="outline" onClick={() => setIsEditingLastActivity(true)}>
+                  Modifier
+                </Button>
               </div>
             )}
           </ScrollArea>
@@ -68,8 +83,9 @@ export function DailyStandupView() {
             <ActivityEditor
               initialContent={todayContent}
               date={new Date()}
-              onSave={() => {
+              onSave={(content) => {
                 setIsEditing(false);
+                setTodayContent(content);
                 fetchActivities();
               }}
               onCancel={() => setIsEditing(false)}

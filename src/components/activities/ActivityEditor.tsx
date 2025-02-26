@@ -8,7 +8,7 @@ import { saveActivity } from '@/services/activities';
 interface ActivityEditorProps {
   initialContent: string;
   date: Date;
-  onSave: () => void;
+  onSave: (content: string) => void;
   onCancel: () => void;
 }
 
@@ -33,7 +33,7 @@ export function ActivityEditor({ initialContent, date, onSave, onCancel }: Activ
         });
       }
       
-      onSave();
+      onSave(content);
     } catch (error) {
       console.error('Erreur:', error);
       toast({
