@@ -227,6 +227,8 @@ export function Analytics() {
                 margin={{
                   left: 12,
                   right: 12,
+                  top: 12,
+                  bottom: 12,
                 }}
               >
                 <CartesianGrid vertical={false} />
@@ -256,11 +258,11 @@ export function Analytics() {
                   }}
                 />
                 <Line
-                  type="stepAfter"
+                  type="step"
                   dataKey="hasActivity"
                   stroke="var(--color-activity)"
                   strokeWidth={2}
-                  dot={{ stroke: 'var(--color-activity)', fill: 'var(--background)' }}
+                  dot={{ stroke: 'var(--color-activity)', fill: 'hsl(var(--background))' }}
                 />
               </LineChart>
             </ChartContainer>
@@ -333,7 +335,7 @@ export function Analytics() {
                   dataKey="wordCount"
                   stroke="var(--color-words)"
                   strokeWidth={2}
-                  dot={{ stroke: 'var(--color-words)', fill: 'var(--background)' }}
+                  dot={{ stroke: 'var(--color-words)', fill: 'hsl(var(--background))' }}
                 />
               </LineChart>
             </ChartContainer>

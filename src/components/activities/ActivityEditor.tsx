@@ -2,48 +2,20 @@ import { useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { saveActivity } from '@/services/activities';
 
 interface ActivityEditorProps {
   initialContent: string;
   date: Date;
   onSave: (content: string) => void;
   onCancel: () => void;
+  isSaving?: boolean;
 }
 
-export function ActivityEditor({ initialContent, date, onSave, onCancel }: ActivityEditorProps) {
+export function ActivityEditor({ initialContent, onSave, onCancel, isSaving = false }: ActivityEditorProps) {
   const [content, setContent] = useState(initialContent);
-  const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await saveActivity(content, date);
-      
-      if (!content.trim()) {
-        toast({
-          title: "Supprimé",
-          description: "L'activité a été supprimée.",
-        });
-      } else {
-        toast({
-          title: "Enregistré !",
-          description: "Votre activité a été enregistrée avec succès.",
-        });
-      }
-      
-      onSave(content);
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast({
-        title: "Erreur",
-        description: "Échec de l'opération.",
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
+  const handleSave = () => {
+    onSave(content);
   };
 
   return (
@@ -55,8 +27,8 @@ export function ActivityEditor({ initialContent, date, onSave, onCancel }: Activ
         className="min-h-[200px]"
       />
       <div className="flex gap-2">
-        <Button onClick={handleSave} disabled={saving}>
-          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Enregistrer
         </Button>
         <Button variant="outline" onClick={onCancel}>

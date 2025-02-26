@@ -6,9 +6,7 @@ import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 import { supabase } from '@/lib/supabase';
 
@@ -120,19 +118,8 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Passer à Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
                 <BadgeCheck className="mr-2 h-4 w-4" />
                 Compte
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Facturation
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell className="mr-2 h-4 w-4" />

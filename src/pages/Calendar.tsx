@@ -104,7 +104,7 @@ export function Calendar() {
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
-      <Card className="w-full md:w-auto h-min">
+      <Card className="w-full md:w-auto">
         <CardHeader>
           <CardTitle>Calendrier</CardTitle>
         </CardHeader>

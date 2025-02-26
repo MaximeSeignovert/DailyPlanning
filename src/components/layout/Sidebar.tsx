@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { NavUser } from '@/components/sidebar/nav-user';
 
@@ -30,6 +31,23 @@ export function Sidebar() {
 
   return (
     <SidebarRoot variant="inset">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link to="/dashboard">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crayon/3D/crayon_3d.png" alt="Logo" className="size-8 drop-shadow-lg hover:rotate-180 transition-transform duration-300" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">DailyPlanning</span>
+                  <span className="truncate text-xs">Enterprise</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
         <ScrollArea className="flex-1">
           <SidebarMenu>
