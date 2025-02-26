@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { getCachedActivities, cacheActivities } from './offline-cache';
 
 export interface Activity {
   id: string;
@@ -7,24 +8,53 @@ export interface Activity {
   user_id: string;
 }
 
+// Vérifier si l'application est en ligne
+function isOnline() {
+  return navigator.onLine;
+}
+
 export async function getActivity(date: Date) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  try {
+    if (!isOnline()) {
+      // Utiliser les données en cache si hors ligne
+      const cachedActivities = getCachedActivities();
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      return cachedActivities.filter((activity: Activity) => {
+        const activityDate = new Date(activity.date);
+        return activityDate >= startOfDay && activityDate <= endOfDay;
+      });
+    }
 
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
+    // Comportement normal en ligne
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Non authentifié');
 
-  const { data, error } = await supabase
-    .from('activities')
-    .select('*')
-    .eq('user_id', user.id)
-    .gte('date', startOfDay.toISOString())
-    .lte('date', endOfDay.toISOString());
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
 
-  if (error) throw error;
-  return data?.filter(activity => activity.content?.trim().length > 0) || [];
+    const { data } = await supabase
+      .from('activities')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('date', startOfDay.toISOString())
+      .lte('date', endOfDay.toISOString())
+      .order('date', { ascending: false });
+
+    // Mettre à jour le cache quand on est en ligne
+    cacheActivities();
+    
+    return data;
+  } catch (error) {
+    console.error('Erreur:', error);
+    // En cas d'erreur, essayer d'utiliser le cache
+    return getCachedActivities();
+  }
 }
 
 export async function saveActivity(content: string, date: Date) {

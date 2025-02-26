@@ -6,6 +6,7 @@ import {
   SidebarTrigger 
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { ConnectionStatus } from "@/components/ui/connection-status";
 
 export function Layout() {
   const location = useLocation();
@@ -48,6 +49,7 @@ export function Layout() {
           </SidebarInset>
         </div>
       </div>
+      <ConnectionStatus />
     </SidebarProvider>
   );
 }
