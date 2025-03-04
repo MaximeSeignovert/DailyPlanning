@@ -30,31 +30,40 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function NavUser() {
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpenMobile } = useSidebar()
   const navigate = useNavigate()
   const [userData, setUserData] = useState<{
     name: string;
     email: string;
     avatar_url: string;
   } | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
+      try {
+        setLoading(true)
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
 
-        setUserData({
-          name: profile?.full_name || user.email?.split('@')[0] || 'Utilisateur',
-          email: user.email || '',
-          avatar_url: profile?.avatar_url || '/default-avatar.png'
-        })
+          setUserData({
+            name: profile?.full_name || user.email?.split('@')[0] || 'Utilisateur',
+            email: user.email || '',
+            avatar_url: profile?.avatar_url || '/default-avatar.png'
+          })
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données utilisateur:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -65,10 +74,36 @@ export function NavUser() {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      if (isMobile) {
+        setOpenMobile(false);
+      }
       navigate('/auth')
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
     }
+  }
+
+  const handleMenuItemClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg">
+            <Skeleton className={isMobile ? "h-10 w-10 rounded-lg" : "h-8 w-8 rounded-lg"} />
+            <div className="grid flex-1 text-left text-sm leading-tight gap-1">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <Skeleton className={isMobile ? "ml-auto h-5 w-5 rounded-full" : "ml-auto h-4 w-4 rounded-full"} />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
   }
 
   if (!userData) return null
@@ -117,11 +152,11 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className={isMobile ? "py-3" : ""}>
+              <DropdownMenuItem className={isMobile ? "py-3" : ""} onClick={handleMenuItemClick}>
                 <BadgeCheck className={isMobile ? "mr-3 h-5 w-5" : "mr-2 h-4 w-4"} />
                 <span className={isMobile ? "text-base" : ""}>Compte</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className={isMobile ? "py-3" : ""}>
+              <DropdownMenuItem className={isMobile ? "py-3" : ""} onClick={handleMenuItemClick}>
                 <Bell className={isMobile ? "mr-3 h-5 w-5" : "mr-2 h-4 w-4"} />
                 <span className={isMobile ? "text-base" : ""}>Notifications</span>
               </DropdownMenuItem>

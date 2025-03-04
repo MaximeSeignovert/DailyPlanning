@@ -21,7 +21,7 @@ import { NavUser } from '@/components/sidebar/nav-user';
 
 export function Sidebar() {
   const location = useLocation();
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
   
   const links = [
     { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -31,13 +31,19 @@ export function Sidebar() {
     { href: '/settings', label: 'Paramètres', icon: Settings },
   ];
 
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <SidebarRoot variant="inset">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/dashboard">
+              <Link to="/dashboard" onClick={handleLinkClick}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
                   <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crayon/3D/crayon_3d.png" alt="Logo" className="size-8 drop-shadow-lg hover:rotate-180 transition-transform duration-300" />
                 </div>
@@ -60,7 +66,7 @@ export function Sidebar() {
                   data-active={location.pathname === href}
                   className={isMobile ? "py-6" : ""}
                 >
-                  <Link to={href} className="no-underline text-inherit">
+                  <Link to={href} className="no-underline text-inherit" onClick={handleLinkClick}>
                     <Icon className={isMobile ? "mx-2 size-6" : "mr-2 size-4"} />
                     <span className={isMobile ? "text-lg" : ""}>{label}</span>
                   </Link>
