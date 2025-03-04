@@ -32,10 +32,9 @@ export function Layout() {
     <SidebarProvider>
       <div className="flex h-screen w-full">
         <Sidebar />
-        <div className="flex-1">
           <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center justify-between px-4">
-              <div className="flex items-center gap-2">
+            <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
+              <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1" />
                 <span className="text-lg font-semibold">{getPageTitle()}</span>
               </div>
@@ -47,7 +46,6 @@ export function Layout() {
               </div>
             </div>
           </SidebarInset>
-        </div>
       </div>
       <ConnectionStatus />
     </SidebarProvider>

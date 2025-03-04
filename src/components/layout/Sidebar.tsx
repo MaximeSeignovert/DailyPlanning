@@ -15,11 +15,13 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { NavUser } from '@/components/sidebar/nav-user';
 
 export function Sidebar() {
   const location = useLocation();
+  const { isMobile } = useSidebar();
   
   const links = [
     { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -56,10 +58,11 @@ export function Sidebar() {
                 <SidebarMenuButton
                   asChild
                   data-active={location.pathname === href}
+                  className={isMobile ? "py-6" : ""}
                 >
                   <Link to={href} className="no-underline text-inherit">
-                    <Icon className="mr-2 h-4 w-4" />
-                    {label}
+                    <Icon className={isMobile ? "mx-2 size-6" : "mr-2 size-4"} />
+                    <span className={isMobile ? "text-lg" : ""}>{label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

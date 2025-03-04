@@ -82,17 +82,17 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className={isMobile ? "h-10 w-10 rounded-lg" : "h-8 w-8 rounded-lg"}>
                 <AvatarImage src={userData.avatar_url} alt={userData.name} />
                 <AvatarFallback className="rounded-lg">
                   {userData.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{userData.name}</span>
-                <span className="truncate text-xs">{userData.email}</span>
+                <span className={`truncate font-semibold ${isMobile ? "text-base" : ""}`}>{userData.name}</span>
+                <span className={`truncate ${isMobile ? "text-sm" : "text-xs"}`}>{userData.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <ChevronsUpDown className={isMobile ? "ml-auto size-5" : "ml-auto size-4"} />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -103,33 +103,33 @@ export function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className={isMobile ? "h-10 w-10 rounded-lg" : "h-8 w-8 rounded-lg"}>
                   <AvatarImage src={userData.avatar_url} alt={userData.name} />
                   <AvatarFallback className="rounded-lg">
                     {userData.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{userData.name}</span>
-                  <span className="truncate text-xs">{userData.email}</span>
+                  <span className={`truncate font-semibold ${isMobile ? "text-base" : ""}`}>{userData.name}</span>
+                  <span className={`truncate ${isMobile ? "text-sm" : "text-xs"}`}>{userData.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck className="mr-2 h-4 w-4" />
-                Compte
+              <DropdownMenuItem className={isMobile ? "py-3" : ""}>
+                <BadgeCheck className={isMobile ? "mr-3 h-5 w-5" : "mr-2 h-4 w-4"} />
+                <span className={isMobile ? "text-base" : ""}>Compte</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell className="mr-2 h-4 w-4" />
-                Notifications
+              <DropdownMenuItem className={isMobile ? "py-3" : ""}>
+                <Bell className={isMobile ? "mr-3 h-5 w-5" : "mr-2 h-4 w-4"} />
+                <span className={isMobile ? "text-base" : ""}>Notifications</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Déconnexion
+            <DropdownMenuItem onClick={handleLogout} className={isMobile ? "py-3" : ""}>
+              <LogOut className={isMobile ? "mr-3 h-5 w-5" : "mr-2 h-4 w-4"} />
+              <span className={isMobile ? "text-base" : ""}>Déconnexion</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
