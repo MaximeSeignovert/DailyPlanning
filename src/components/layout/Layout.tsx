@@ -23,6 +23,8 @@ export function Layout() {
         return 'Analytique';
       case '/settings':
         return 'Paramètres';
+      case '/changelog':
+        return 'Changelog';
       default:
         return 'Gestionnaire Quotidien';
     }

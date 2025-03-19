@@ -1,0 +1,11 @@
+{
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "date": "2024-03-19",
+      "changes": [
+        "Ajout de la fonctionnalité d'indentation avec Tab et Shift+Tab dans l'éditeur d'activités"
+      ]
+    }
+  ]
+} 

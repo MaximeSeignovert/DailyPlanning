@@ -6,6 +6,7 @@ import {
   LayoutDashboard, 
   Settings, 
   LineChart,
+  History,
 } from 'lucide-react';
 import {
   Sidebar as SidebarRoot,
@@ -28,6 +29,7 @@ export function Sidebar() {
     { href: '/journal', label: 'Journal', icon: BookOpen },
     { href: '/calendar', label: 'Calendrier', icon: Calendar },
     { href: '/analytics', label: 'Analytique', icon: LineChart },
+    { href: '/changelog', label: 'Changelog', icon: History },
     { href: '/settings', label: 'Paramètres', icon: Settings },
   ];
 

@@ -6,6 +6,7 @@ import { Calendar } from "@/pages/Calendar"
 import { Analytics } from "@/pages/Analytics"
 import { Settings } from "@/pages/Settings"
 import { Auth } from "@/pages/Auth"
+import { Changelog } from "@/pages/Changelog"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 
 const router = createBrowserRouter([
@@ -45,10 +46,14 @@ const router = createBrowserRouter([
         path: "settings",
         element: <Settings />,
       },
+      {
+        path: "changelog",
+        element: <Changelog />,
+      },
     ],
   },
 ])
 
 export function Router() {
   return <RouterProvider router={router} />
-} 
+}
