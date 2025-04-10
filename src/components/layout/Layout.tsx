@@ -43,7 +43,7 @@ export function Layout() {
               <ThemeToggle />
             </header>
             <div className="h-[calc(100vh-4rem)] overflow-y-auto">
-              <div className="w-full p-8">
+              <div className="w-full p-4 md:p-8">
                 <Outlet />
               </div>
             </div>

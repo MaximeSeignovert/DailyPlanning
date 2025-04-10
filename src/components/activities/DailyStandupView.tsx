@@ -10,6 +10,7 @@ import { fr } from 'date-fns/locale';
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
 import { saveActivity } from '@/services/activities';
+import { useUser } from '@/contexts/UserContext';
 
 export function DailyStandupView() {
   const [todayContent, setTodayContent] = useState('');
@@ -20,12 +21,15 @@ export function DailyStandupView() {
   const [isLoadingLastActivity, setIsLoadingLastActivity] = useState(true);
   const [isSavingToday, setIsSavingToday] = useState(false);
   const [isSavingLastActivity, setIsSavingLastActivity] = useState(false);
+  const { userData } = useUser();
 
   const fetchTodayActivity = async () => {
+    if (!userData) return;
+    
     setIsLoadingToday(true);
     try {
       const today = new Date();
-      const todayActivities = await getActivity(today);
+      const todayActivities = await getActivity(today, userData.id);
       if (todayActivities && todayActivities.length > 0) {
         setTodayContent(todayActivities[0].content);
       } else {
@@ -44,9 +48,11 @@ export function DailyStandupView() {
   };
 
   const fetchLastActivity = async () => {
+    if (!userData) return;
+    
     setIsLoadingLastActivity(true);
     try {
-      const lastAct = await getLastActivity();
+      const lastAct = await getLastActivity(userData.id);
       setLastActivity(lastAct);
     } catch (error) {
       console.error('Erreur lors du chargement de la dernière activité:', error);
@@ -61,9 +67,11 @@ export function DailyStandupView() {
   };
 
   const handleSaveToday = async (content: string) => {
+    if (!userData) return;
+    
     setIsSavingToday(true);
     try {
-      await saveActivity(content, new Date());
+      await saveActivity(content, new Date(), userData.id);
       setTodayContent(content);
       setIsEditing(false);
       toast({
@@ -84,11 +92,11 @@ export function DailyStandupView() {
   };
 
   const handleSaveLastActivity = async (content: string) => {
-    if (!lastActivity) return;
+    if (!userData || !lastActivity) return;
     
     setIsSavingLastActivity(true);
     try {
-      await saveActivity(content, new Date(lastActivity.date));
+      await saveActivity(content, new Date(lastActivity.date), userData.id);
       setLastActivity({ ...lastActivity, content });
       setIsEditingLastActivity(false);
       toast({
@@ -111,7 +119,7 @@ export function DailyStandupView() {
   useEffect(() => {
     fetchTodayActivity();
     fetchLastActivity();
-  }, []);
+  }, [userData]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

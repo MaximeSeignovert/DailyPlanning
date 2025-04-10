@@ -13,7 +13,7 @@ function isOnline() {
   return navigator.onLine;
 }
 
-export async function getActivity(date: Date) {
+export async function getActivity(date: Date, userId: string) {
   try {
     if (!isOnline()) {
       // Utiliser les données en cache si hors ligne
@@ -29,10 +29,6 @@ export async function getActivity(date: Date) {
       });
     }
 
-    // Comportement normal en ligne
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Non authentifié');
-
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
@@ -41,13 +37,13 @@ export async function getActivity(date: Date) {
     const { data } = await supabase
       .from('activities')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .gte('date', startOfDay.toISOString())
       .lte('date', endOfDay.toISOString())
       .order('date', { ascending: false });
 
     // Mettre à jour le cache quand on est en ligne
-    cacheActivities();
+    cacheActivities(userId);
     
     return data;
   } catch (error) {
@@ -57,10 +53,7 @@ export async function getActivity(date: Date) {
   }
 }
 
-export async function saveActivity(content: string, date: Date) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Non authentifié');
-
+export async function saveActivity(content: string, date: Date, userId: string) {
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
   const endOfDay = new Date(date);
@@ -69,7 +62,7 @@ export async function saveActivity(content: string, date: Date) {
   const { data: existingActivities } = await supabase
     .from('activities')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .gte('date', startOfDay.toISOString())
     .lte('date', endOfDay.toISOString());
 
@@ -96,7 +89,7 @@ export async function saveActivity(content: string, date: Date) {
       const { data } = await supabase
         .from('activities')
         .insert([{
-          user_id: user.id,
+          user_id: userId,
           content: trimmedContent,
           date: date.toISOString(),
         }])
@@ -107,30 +100,24 @@ export async function saveActivity(content: string, date: Date) {
   }
 }
 
-export async function getAllActivitiesWithDates() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
+export async function getAllActivitiesWithDates(userId: string) {
   const { data, error } = await supabase
     .from('activities')
     .select('*')
-    .eq('user_id', user.id);
+    .eq('user_id', userId);
 
   if (error) throw error;
   return data?.filter(activity => activity.content?.trim().length > 0) || [];
 }
 
-export async function getLastActivity() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-
+export async function getLastActivity(userId: string) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const { data, error } = await supabase
     .from('activities')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .lt('date', today.toISOString())
     .order('date', { ascending: false })
     .limit(1);

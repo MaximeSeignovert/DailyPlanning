@@ -3,9 +3,10 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from '@/lib/supabase';
 import ReactMarkdown from 'react-markdown';
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUser } from '@/contexts/UserContext';
+import { supabase } from '@/lib/supabase';
 
 interface Activity {
   id: string;
@@ -24,11 +25,11 @@ export function RecentActivities() {
     today: [],
     lastTime: []
   });
+  const { userData } = useUser();
 
   useEffect(() => {
     const fetchActivities = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!userData) return;
 
       try {
         // Obtenir la date d'aujourd'hui (début et fin)
@@ -41,7 +42,7 @@ export function RecentActivities() {
         const { data, error } = await supabase
           .from('activities')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', userData.id)
           .order('date', { ascending: false })
           .limit(10);
 
@@ -69,7 +70,7 @@ export function RecentActivities() {
     };
 
     fetchActivities();
-  }, []);
+  }, [userData]);
 
   if (loading) {
     return (

@@ -1,16 +1,15 @@
 import { supabase } from '@/lib/supabase';
 
 // Fonction pour mettre en cache les activités
-export async function cacheActivities() {
+export async function cacheActivities(userId: string) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!userId) return;
 
     // Récupérer toutes les activités de l'utilisateur
     const { data: activities } = await supabase
       .from('activities')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     // Stocker dans le localStorage
     if (activities) {

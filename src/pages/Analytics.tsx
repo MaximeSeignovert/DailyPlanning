@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LineChart, Line, XAxis, CartesianGrid, Tooltip } from 'recharts';
 import { ChartConfig, ChartContainer} from "@/components/ui/chart";
 import { TrendingUp, TrendingDown } from "lucide-react"
+import { useUser } from '@/contexts/UserContext';
 
 interface ActivityStats {
   totalDays: number;
@@ -42,19 +43,19 @@ export function Analytics() {
     streakDays: 0,
   });
   const [chartData, setChartData] = useState<{ date: string; hasActivity: number }[]>([]);
-  const [wordCountTrend, setWordCountTrend] = useState<Array<{ date: string; wordCount: number }>>([]);
+  const [wordCountTrend, setWordCountTrend] = useState<Array<{ date: string; wordCount: number }>>([]); 
+  const { userData } = useUser();
 
   useEffect(() => {
     const fetchStats = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!userData) return;
 
       try {
         // Récupérer toutes les activités
         const { data: activities, error } = await supabase
           .from('activities')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', userData.id);
 
         if (error) throw error;
 
@@ -114,7 +115,7 @@ export function Analytics() {
     };
 
     fetchStats();
-  }, []);
+  }, [userData]);
 
   const calculateStreak = (activities: Activity[]) => {
     if (!activities.length) return 0;

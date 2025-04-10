@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BadgeCheck,
@@ -31,44 +30,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUser } from '@/contexts/UserContext';
 
 export function NavUser() {
   const { isMobile, setOpenMobile } = useSidebar()
   const navigate = useNavigate()
-  const [userData, setUserData] = useState<{
-    name: string;
-    email: string;
-    avatar_url: string;
-  } | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setLoading(true)
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-
-          setUserData({
-            name: profile?.full_name || user.email?.split('@')[0] || 'Utilisateur',
-            email: user.email || '',
-            avatar_url: profile?.avatar_url || '/default-avatar.png'
-          })
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des données utilisateur:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchUserData()
-  }, [])
+  const { userData, loading } = useUser()
 
   const handleLogout = async () => {
     try {

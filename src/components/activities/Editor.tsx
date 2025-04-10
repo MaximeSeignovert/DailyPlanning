@@ -5,22 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from '@/lib/supabase';
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
 
 export function Editor() {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
+  const { userData } = useUser();
 
   const handleSave = async () => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!userData) throw new Error('Not authenticated');
 
       const { error } = await supabase
         .from('activities')
         .insert([
           {
-            user_id: user.id,
+            user_id: userData.id,
             content,
             date: new Date().toISOString(),
           },

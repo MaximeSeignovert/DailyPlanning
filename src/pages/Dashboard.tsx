@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { PenLine, Calendar as CalendarIcon, LineChart, BookOpen } from "lucide-react";
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { useUser } from '@/contexts/UserContext';
 
 interface Activity {
   id: string;
@@ -32,11 +33,11 @@ export function Dashboard() {
     totalActivities: 0,
     recentActivities: [],
   });
+  const { userData } = useUser();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!userData) return;
 
       try {
         const today = new Date();
@@ -48,7 +49,7 @@ export function Dashboard() {
         const { data: todayData } = await supabase
           .from('activities')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', userData.id)
           .gte('date', today.toISOString())
           .lt('date', tomorrow.toISOString());
 
@@ -56,14 +57,14 @@ export function Dashboard() {
         const { data: allActivities } = await supabase
           .from('activities')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', userData.id)
           .order('date', { ascending: false });
 
         // Récupérer les activités récentes
         const { data: recentData } = await supabase
           .from('activities')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', userData.id)
           .order('date', { ascending: false })
           .limit(5);
 
@@ -81,7 +82,7 @@ export function Dashboard() {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [userData]);
 
   const calculateStreak = (activities: Activity[]) => {
     if (!activities.length) return 0;

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from 'react-markdown';
 import { getAllActivitiesWithDates, Activity } from '@/services/activities';
+import { useUser } from '@/contexts/UserContext';
 
 interface GroupedActivities {
   [key: string]: Activity[];
@@ -12,11 +13,14 @@ interface GroupedActivities {
 
 export function ActivityList() {
   const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
+  const { userData } = useUser();
 
   useEffect(() => {
     const fetchActivities = async () => {
+      if (!userData) return;
+
       try {
-        const activities = await getAllActivitiesWithDates();
+        const activities = await getAllActivitiesWithDates(userData.id);
         const grouped = activities.reduce((acc: GroupedActivities, activity) => {
           const date = format(new Date(activity.date), 'yyyy-MM-dd');
           if (!acc[date]) {
@@ -32,7 +36,7 @@ export function ActivityList() {
     };
 
     fetchActivities();
-  }, []);
+  }, [userData]);
 
   return (
     <Card className="w-full">

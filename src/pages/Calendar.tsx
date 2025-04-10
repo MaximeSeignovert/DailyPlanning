@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ActivityEditor } from "@/components/activities/ActivityEditor";
 import { getActivity, getAllActivitiesWithDates, Activity } from '@/services/activities';
+import { useUser } from '@/contexts/UserContext';
 
 export function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -19,11 +20,12 @@ export function Calendar() {
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [editingContent, setEditingContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const { userData } = useUser();
 
   const fetchAllDatesWithActivities = async () => {
     setLoading(true);
     try {
-      const activities = await getAllActivitiesWithDates();
+      const activities = await getAllActivitiesWithDates(userData?.id.toString() || '');
       const dates = activities.map(activity => new Date(activity.date));
       setDatesWithActivities(dates);
     } catch (error) {
@@ -36,7 +38,7 @@ export function Calendar() {
   const fetchActivitiesForDate = async (date: Date) => {
     setLoadingActivities(true);
     try {
-      const activities = await getActivity(date);
+      const activities = await getActivity(date, userData?.id.toString() || '');
       setActivities(activities || []);
       if (activities && activities.length > 0) {
         setEditingContent(activities[0].content);
