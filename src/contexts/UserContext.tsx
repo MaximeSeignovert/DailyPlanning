@@ -36,6 +36,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           .eq('id', user.id)
           .single();
 
+        console.log('user', user);
         setUserData({
           id: user.id,
           name: profile?.full_name || user.email?.split('@')[0] || 'Utilisateur',

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,73 +9,95 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ActivityEditor } from "@/components/activities/ActivityEditor";
-import { getActivity, getAllActivitiesWithDates, Activity, saveActivity } from '@/services/activities';
+import { Activity } from '@/services/activities';
 import { useUser } from '@/contexts/UserContext';
+import { useAllActivities, useSaveActivity, filterActivitiesByDate } from '@/hooks/useActivities';
+import { toast } from '@/components/ui/use-toast';
 
 export function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [datesWithActivities, setDatesWithActivities] = useState<Date[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingActivities, setLoadingActivities] = useState(false);
   const [editingContent, setEditingContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const { userData } = useUser();
-
-  const fetchAllDatesWithActivities = async () => {
-    setLoading(true);
-    try {
-      const activities = await getAllActivitiesWithDates(userData?.id.toString() || '');
-      const dates = activities.map(activity => new Date(activity.date));
-      setDatesWithActivities(dates);
-    } catch (error) {
-      console.error('Erreur:', error);
-    } finally {
-      setLoading(false);
+  
+  // Récupérer toutes les activités en une seule requête
+  const { 
+    data: allActivities = [], 
+    isLoading: loadingActivities,
+    error: activitiesError
+  } = useAllActivities(userData?.id);
+  
+  // Filtrer les activités selon la date sélectionnée (local)
+  const activitiesForSelectedDate = useMemo(() => 
+    filterActivitiesByDate(allActivities, selectedDate),
+  [allActivities, selectedDate]);
+  
+  // Mettre à jour le contenu d'édition lorsque la date change
+  useEffect(() => {
+    if (activitiesForSelectedDate.length > 0) {
+      setEditingContent(activitiesForSelectedDate[0].content);
+    } else {
+      setEditingContent('');
     }
-  };
-
-  const fetchActivitiesForDate = async (date: Date) => {
-    setLoadingActivities(true);
-    try {
-      const activities = await getActivity(date, userData?.id.toString() || '');
-      setActivities(activities || []);
-      if (activities && activities.length > 0) {
-        setEditingContent(activities[0].content);
-      } else {
-        setEditingContent('');
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-    } finally {
-      setLoadingActivities(false);
+  }, [activitiesForSelectedDate]);
+  
+  const saveActivityMutation = useSaveActivity();
+  
+  // Afficher les erreurs si nécessaire
+  useEffect(() => {
+    if (activitiesError) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les activités.",
+        variant: "destructive",
+      });
     }
-  };
+  }, [activitiesError]);
 
   const handleEdit = (content: string) => {
     setEditingContent(content);
     setIsEditing(true);
   };
 
-  useEffect(() => {
-    fetchAllDatesWithActivities();
-  }, []);
-
-  useEffect(() => {
-    if (selectedDate) {
-      fetchActivitiesForDate(selectedDate);
+  const handleSave = async (content: string) => {
+    if (!userData || !selectedDate) return;
+    
+    try {
+      await saveActivityMutation.mutateAsync({
+        content,
+        date: selectedDate,
+        userId: userData.id
+      });
+      
+      setIsEditing(false);
+      toast({
+        title: "Enregistré !",
+        description: "Votre activité a été enregistrée avec succès.",
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement de l\'activité:', error);
+      toast({
+        title: "Erreur",
+        description: "Échec de l'enregistrement de l'activité.",
+        variant: "destructive",
+      });
     }
-  }, [selectedDate]);
+  };
 
-  const modifiers = {
+  // Extraire les dates qui ont des activités 
+  const activityDates = useMemo(() => 
+    allActivities.map(activity => new Date(activity.date)),
+  [allActivities]);
+
+  const modifiers = useMemo(() => ({
     hasActivity: (date: Date) =>
-      datesWithActivities.some(
+      activityDates.some(
         activityDate =>
           format(activityDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
       ),
-  };
+  }), [activityDates]);
 
-  if (loading) {
+  if (loadingActivities) {
     return (
       <div className="flex flex-col md:flex-row gap-8">
         <Card className="w-full md:w-auto">
@@ -135,27 +157,18 @@ export function Calendar() {
             Activités du {selectedDate && format(selectedDate, 'dd MMMM yyyy', { locale: fr })}
           </CardTitle>
         </CardHeader>
-        <CardContent >
-          {loadingActivities ? (
-            <div className="space-y-4">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          ) : isEditing ? (
+        <CardContent>
+          {isEditing ? (
             <ActivityEditor
               initialContent={editingContent}
               date={selectedDate || new Date()}
-              onSave={async (content: string) => {
-                await saveActivity(content, new Date(selectedDate || new Date()), userData?.id.toString() || '');
-                setIsEditing(false);
-                fetchActivitiesForDate(selectedDate || new Date());
-                fetchAllDatesWithActivities();
-              }}
+              onSave={handleSave}
               onCancel={() => setIsEditing(false)}
+              isSaving={saveActivityMutation.isPending}
             />
           ) : (
-            <ScrollArea className=" border p-4 rounded-md pr-4">
-              {activities.length === 0 ? (
+            <ScrollArea className="border p-4 rounded-md pr-4">
+              {activitiesForSelectedDate.length === 0 ? (
                 <div className="flex flex-col items-center gap-4">
                   <p className="text-muted-foreground">Aucune activité pour cette date</p>
                   <Button onClick={() => handleEdit('')}>
@@ -164,7 +177,7 @@ export function Calendar() {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {activities.map((activity) => (
+                  {activitiesForSelectedDate.map((activity: Activity) => (
                     <div key={activity.id} className="space-y-4">
                       <div className="prose prose-sm dark:prose-invert">
                         <ReactMarkdown>{activity.content}</ReactMarkdown>
