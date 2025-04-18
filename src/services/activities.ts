@@ -125,3 +125,24 @@ export async function getLastActivity(userId: string) {
   if (error) throw error;
   return data?.[0] || null;
 } 
+
+export async function getActivitiesCountFromPeriod(startDate: Date, endDate: Date, userId: string) {
+  const startOfPeriod = new Date(startDate);
+  startOfPeriod.setHours(0, 0, 0, 0);
+  const endOfPeriod = new Date(endDate);
+  endOfPeriod.setHours(23, 59, 59, 999);
+
+  console.log('startOfPeriod', startOfPeriod);
+  console.log('endOfPeriod', endOfPeriod);
+
+  const { data, error } = await supabase
+    .from('activities')
+    .select('date', { count: 'exact' })
+    .eq('user_id', userId)
+    .gte('date', startOfPeriod.toISOString())
+    .lte('date', endOfPeriod.toISOString());
+
+  console.log('data', data);
+  if (error) throw error;
+  return data?.length || 0;
+}

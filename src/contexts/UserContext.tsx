@@ -29,17 +29,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+        
 
         setUserData({
           id: user.id,
-          name: profile?.full_name || user.email?.split('@')[0] || 'Utilisateur',
+          name: user.email?.split('@')[0] || 'Utilisateur',
           email: user.email || '',
-          avatar_url: profile?.avatar_url || '/default-avatar.png'
+          avatar_url:'/default-avatar.png'
         });
       } else {
         setUserData(null);
