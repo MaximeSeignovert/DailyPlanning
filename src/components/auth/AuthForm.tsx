@@ -157,7 +157,6 @@ export function AuthForm() {
 
   const handleLogoClick = () => {
     changeColor();
-    console.log("Affichage du toast...");
     
     // Afficher un toast avec un message aléatoire
     const messages = [

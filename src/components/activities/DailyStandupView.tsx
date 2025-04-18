@@ -31,8 +31,6 @@ export function DailyStandupView() {
   } = useLastActivity(userData?.id) as { data: Activity | null, isLoading: boolean, error: unknown };
   
 
-  console.log(todayActivity);
-  console.log(lastActivity);
 
   const saveActivityMutation = useSaveActivity();
   
@@ -68,8 +66,7 @@ export function DailyStandupView() {
         title: "Enregistré !",
         description: "Votre activité du jour a été enregistrée avec succès.",
       });
-    } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de l\'activité du jour:', error);
+    } catch {
       toast({
         title: "Erreur",
         description: "Échec de l'enregistrement de l'activité du jour.",

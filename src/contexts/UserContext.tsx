@@ -25,7 +25,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refreshUserData = async () => {
-    console.log('refreshUserData');
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -36,7 +35,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           .eq('id', user.id)
           .single();
 
-        console.log('user', user);
         setUserData({
           id: user.id,
           name: profile?.full_name || user.email?.split('@')[0] || 'Utilisateur',

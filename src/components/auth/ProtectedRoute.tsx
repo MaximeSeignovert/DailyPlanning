@@ -5,11 +5,11 @@ import { useUser } from '@/contexts/UserContext';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  const { userData } = useUser();
+  const { userData, loading } = useUser();
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (!userData) {
+      if (!loading && !userData) {
         navigate('/auth');
       }
     };
@@ -25,7 +25,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, userData]);
+  }, [navigate, userData, loading]);
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
 
   return <>{children}</>;
 } 

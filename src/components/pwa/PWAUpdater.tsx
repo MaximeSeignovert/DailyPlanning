@@ -9,11 +9,9 @@ export function PWAUpdater() {
     offlineReady,
     updateServiceWorker,
   } = useRegisterSW({
-    onRegistered(r) {
-      console.log('SW enregistré:', r);
+    onRegistered() {
     },
-    onRegisterError(error) {
-      console.log('Erreur SW:', error);
+    onRegisterError() {
     },
     onNeedRefresh() {
       setNeedRefresh(true);
