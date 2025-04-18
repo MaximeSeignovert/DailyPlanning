@@ -56,7 +56,7 @@ export function ActivityEditor({ initialContent, onSave, onCancel, isSaving = fa
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-h-[200px] font-mono whitespace-pre"
+        className="min-h-[200px] md:h-[500px] flex-1 font-mono whitespace-pre"
       />
       <div className="flex gap-2">
         <Button onClick={handleSave} disabled={isSaving}>

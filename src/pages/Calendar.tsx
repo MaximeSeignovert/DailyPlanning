@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ActivityEditor } from "@/components/activities/ActivityEditor";
-import { getActivity, getAllActivitiesWithDates, Activity } from '@/services/activities';
+import { getActivity, getAllActivitiesWithDates, Activity, saveActivity } from '@/services/activities';
 import { useUser } from '@/contexts/UserContext';
 
 export function Calendar() {
@@ -106,7 +106,7 @@ export function Calendar() {
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
-      <Card className="w-full md:w-auto">
+      <Card className="w-full md:w-auto h-min">
         <CardHeader>
           <CardTitle>Calendrier</CardTitle>
         </CardHeader>
@@ -129,13 +129,13 @@ export function Calendar() {
         </CardContent>
       </Card>
 
-      <Card className="w-full md:flex-1 h-min">
+      <Card className="w-full md:flex-1">
         <CardHeader>
           <CardTitle>
             Activités du {selectedDate && format(selectedDate, 'dd MMMM yyyy', { locale: fr })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent >
           {loadingActivities ? (
             <div className="space-y-4">
               <Skeleton className="h-12 w-full" />
@@ -145,7 +145,8 @@ export function Calendar() {
             <ActivityEditor
               initialContent={editingContent}
               date={selectedDate || new Date()}
-              onSave={() => {
+              onSave={async (content: string) => {
+                await saveActivity(content, new Date(selectedDate || new Date()), userData?.id.toString() || '');
                 setIsEditing(false);
                 fetchActivitiesForDate(selectedDate || new Date());
                 fetchAllDatesWithActivities();
@@ -153,7 +154,7 @@ export function Calendar() {
               onCancel={() => setIsEditing(false)}
             />
           ) : (
-            <ScrollArea className="h-[300px] border p-4 rounded-md pr-4">
+            <ScrollArea className=" border p-4 rounded-md pr-4">
               {activities.length === 0 ? (
                 <div className="flex flex-col items-center gap-4">
                   <p className="text-muted-foreground">Aucune activité pour cette date</p>
