@@ -1,84 +1,73 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { ActivityEditor } from "@/components/activities/ActivityEditor";
-import { getActivity, getLastActivity, Activity } from '@/services/activities';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
-import { saveActivity } from '@/services/activities';
 import { useUser } from '@/contexts/UserContext';
+import { useTodayActivity, useLastActivity, useSaveActivity } from '@/hooks/useActivities';
+import { Activity } from '@/services/activities';
 
 export function DailyStandupView() {
-  const [todayContent, setTodayContent] = useState('');
-  const [lastActivity, setLastActivity] = useState<Activity | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingLastActivity, setIsEditingLastActivity] = useState(false);
-  const [isLoadingToday, setIsLoadingToday] = useState(true);
-  const [isLoadingLastActivity, setIsLoadingLastActivity] = useState(true);
-  const [isSavingToday, setIsSavingToday] = useState(false);
-  const [isSavingLastActivity, setIsSavingLastActivity] = useState(false);
   const { userData } = useUser();
+  
+  // Utiliser TanStack Query pour gérer les données et les états
+  const { 
+    data: todayActivity,
+    isLoading: isLoadingToday,
+    error: todayError
+  } = useTodayActivity(userData?.id) as { data: Activity | null, isLoading: boolean, error: unknown };
+  
+  const { 
+    data: lastActivity,
+    isLoading: isLoadingLastActivity,
+    error: lastActivityError 
+  } = useLastActivity(userData?.id) as { data: Activity | null, isLoading: boolean, error: unknown };
+  
 
-  const fetchTodayActivity = async () => {
-    if (!userData) return;
-    
-    setIsLoadingToday(true);
-    try {
-      const today = new Date();
-      const todayActivities = await getActivity(today, userData.id);
-      if (todayActivities && todayActivities.length > 0) {
-        setTodayContent(todayActivities[0].content);
-      } else {
-        setTodayContent('');
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'activité du jour:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger l'activité du jour.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingToday(false);
-    }
-  };
+  console.log(todayActivity);
+  console.log(lastActivity);
 
-  const fetchLastActivity = async () => {
-    if (!userData) return;
-    
-    setIsLoadingLastActivity(true);
-    try {
-      const lastAct = await getLastActivity(userData.id);
-      setLastActivity(lastAct);
-    } catch (error) {
-      console.error('Erreur lors du chargement de la dernière activité:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger la dernière activité.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingLastActivity(false);
-    }
-  };
-
+  const saveActivityMutation = useSaveActivity();
+  
+  // Afficher les erreurs si nécessaire
+  if (todayError) {
+    toast({
+      title: "Erreur",
+      description: "Impossible de charger l'activité du jour.",
+      variant: "destructive",
+    });
+  }
+  
+  if (lastActivityError) {
+    toast({
+      title: "Erreur",
+      description: "Impossible de charger la dernière activité.",
+      variant: "destructive",
+    });
+  }
+  
   const handleSaveToday = async (content: string) => {
     if (!userData) return;
     
-    setIsSavingToday(true);
     try {
-      await saveActivity(content, new Date(), userData.id);
-      setTodayContent(content);
+      await saveActivityMutation.mutateAsync({
+        content,
+        date: new Date(),
+        userId: userData.id
+      });
+      
       setIsEditing(false);
       toast({
         title: "Enregistré !",
         description: "Votre activité du jour a été enregistrée avec succès.",
       });
-      await fetchTodayActivity();
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement de l\'activité du jour:', error);
       toast({
@@ -86,24 +75,24 @@ export function DailyStandupView() {
         description: "Échec de l'enregistrement de l'activité du jour.",
         variant: "destructive",
       });
-    } finally {
-      setIsSavingToday(false);
     }
   };
 
   const handleSaveLastActivity = async (content: string) => {
     if (!userData || !lastActivity) return;
     
-    setIsSavingLastActivity(true);
     try {
-      await saveActivity(content, new Date(lastActivity.date), userData.id);
-      setLastActivity({ ...lastActivity, content });
+      await saveActivityMutation.mutateAsync({
+        content,
+        date: new Date(lastActivity.date),
+        userId: userData.id
+      });
+      
       setIsEditingLastActivity(false);
       toast({
         title: "Enregistré !",
         description: "La dernière activité a été mise à jour avec succès.",
       });
-      await fetchLastActivity();
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la dernière activité:', error);
       toast({
@@ -111,15 +100,8 @@ export function DailyStandupView() {
         description: "Échec de la mise à jour de la dernière activité.",
         variant: "destructive",
       });
-    } finally {
-      setIsSavingLastActivity(false);
     }
   };
-
-  useEffect(() => {
-    fetchTodayActivity();
-    fetchLastActivity();
-  }, [userData]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -147,7 +129,7 @@ export function DailyStandupView() {
                 date={new Date(lastActivity?.date || new Date())}
                 onSave={handleSaveLastActivity}
                 onCancel={() => setIsEditingLastActivity(false)}
-                isSaving={isSavingLastActivity}
+                isSaving={saveActivityMutation.isPending}
               />
             ) : (
               <div className="space-y-4">
@@ -166,7 +148,7 @@ export function DailyStandupView() {
         <CardHeader>
           <CardTitle>✍️ Aujourd'hui</CardTitle>
           <CardDescription>
-            {todayContent && format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}
+            {todayActivity && format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -180,16 +162,16 @@ export function DailyStandupView() {
             </div>
           ) : isEditing ? (
             <ActivityEditor
-              initialContent={todayContent}
+              initialContent={todayActivity?.content || ''}
               date={new Date()}
               onSave={handleSaveToday}
               onCancel={() => setIsEditing(false)}
-              isSaving={isSavingToday}
+              isSaving={saveActivityMutation.isPending}
             />
           ) : (
             <div className="space-y-4">
               <div className="prose prose-sm dark:prose-invert">
-                <ReactMarkdown>{todayContent}</ReactMarkdown>
+                <ReactMarkdown>{todayActivity?.content || ''}</ReactMarkdown>
               </div>
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 Modifier
