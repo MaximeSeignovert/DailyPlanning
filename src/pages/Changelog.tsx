@@ -17,8 +17,7 @@ export function Changelog() {
   const { changelog } = changelogData as ChangelogData;
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <h1 className="text-3xl font-bold">Changelog</h1>
+    <div className="mx-auto space-y-8">
       <div className="space-y-6">
         {changelog.map((entry, index) => (
           <Card key={index}>
