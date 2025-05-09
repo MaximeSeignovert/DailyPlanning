@@ -244,7 +244,7 @@ export function Analytics() {
                   content={({ active, payload, label }) => {
                     if (!active || !payload?.length) return null;
                     return (
-                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div className="rounded-lg border bg-background p-2 shadow-xs">
                         <div className="font-medium">
                           {format(new Date(label), 'EEEE dd MMMM yyyy', { locale: fr })}
                         </div>
@@ -317,7 +317,7 @@ export function Analytics() {
                   content={({ active, payload, label }) => {
                     if (!active || !payload?.length) return null;
                     return (
-                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div className="rounded-lg border bg-background p-2 shadow-xs">
                         <div className="font-medium">
                           {format(new Date(label), 'EEEE dd MMMM yyyy', { locale: fr })}
                         </div>

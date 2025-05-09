@@ -95,7 +95,7 @@ export default function Landing() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-              <Card className="bg-card text-card-foreground border-border shadow-sm hover:shadow transition-shadow">
+              <Card className="bg-card text-card-foreground border-border shadow-xs hover:shadow-sm transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold text-primary">Planning Intelligent</CardTitle>
                 </CardHeader>
@@ -104,7 +104,7 @@ export default function Landing() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-card text-card-foreground border-border shadow-sm hover:shadow transition-shadow">
+              <Card className="bg-card text-card-foreground border-border shadow-xs hover:shadow-sm transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold text-primary">Suivi des Objectifs</CardTitle>
                 </CardHeader>
@@ -113,7 +113,7 @@ export default function Landing() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-card text-card-foreground border-border shadow-sm hover:shadow transition-shadow">
+              <Card className="bg-card text-card-foreground border-border shadow-xs hover:shadow-sm transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold text-primary">Analytics Détaillés</CardTitle>
                 </CardHeader>
