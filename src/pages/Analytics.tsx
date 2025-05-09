@@ -261,9 +261,9 @@ export function Analytics() {
                 <Line
                   type="step"
                   dataKey="hasActivity"
-                  stroke="var(--color-activity)"
+                  stroke="var(--chart-1)"
                   strokeWidth={2}
-                  dot={{ stroke: 'var(--color-activity)', fill: 'hsl(var(--background))' }}
+                  dot={{ stroke: 'var(--chart-1)', fill: 'var(--chart-1)' }}
                 />
               </LineChart>
             </ChartContainer>
@@ -334,9 +334,9 @@ export function Analytics() {
                 <Line
                   type="monotone"
                   dataKey="wordCount"
-                  stroke="var(--color-words)"
+                  stroke="var(--chart-2)"
                   strokeWidth={2}
-                  dot={{ stroke: 'var(--color-words)', fill: 'hsl(var(--background))' }}
+                  dot={{ stroke: 'var(--chart-2)', fill: 'var(--chart-2)' }}
                 />
               </LineChart>
             </ChartContainer>

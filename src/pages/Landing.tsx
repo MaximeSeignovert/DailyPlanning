@@ -15,6 +15,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function Landing() {
             <div className="flex items-center space-x-2">
               <span className="text-3xl font-bold text-primary">DailyPlanning</span>
               <Badge variant="outline" className="ml-2">Beta</Badge>
+              
             </div>
             <div className="flex items-center space-x-4">
               <TooltipProvider>
@@ -34,7 +36,7 @@ export default function Landing() {
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="text-foreground hover:text-primary hover:bg-background"
+                      className="cursor-pointer hover:underline text-foreground hover:text-primary hover:bg-background"
                       onClick={() => navigate({ to: "/auth" })}
                     >
                       Se connecter
@@ -47,11 +49,12 @@ export default function Landing() {
               </TooltipProvider>
               <Button
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                className="cursor-pointer border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => navigate({ to: "/auth" })}
               >
                 S'inscrire
               </Button>
+              <ThemeToggle />
             </div>
           </nav>
         </header>
@@ -62,15 +65,15 @@ export default function Landing() {
               Découvrez notre nouvel outil
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
-              Planifiez votre <span className="text-primary">succès quotidien</span>
+              Planifiez votre <span className="text-primary">quotidien</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl">
-              Organisez vos tâches, suivez vos objectifs et maximisez votre productivité avec notre outil de planification intelligent.
+              Organisez vos tâches journalières, suivez vos objectifs et maximisez votre productivité avec notre outil de planification intelligent.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90"
+                className="cursor-pointer text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => navigate({ to: "/auth" })}
               >
                 Commencer gratuitement
@@ -78,7 +81,7 @@ export default function Landing() {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-lg px-8 py-6 border-primary text-primary hover:bg-primary/10"
+                className="cursor-pointer text-lg px-8 py-6 border-primary text-primary hover:bg-primary/10"
                 onClick={() => window.scrollTo({ top: document.getElementById('features')?.offsetTop, behavior: 'smooth' })}
               >
                 Découvrir les fonctionnalités
@@ -157,7 +160,7 @@ export default function Landing() {
                     Comment contacter le support ?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    Vous pouvez contacter notre équipe de support via la page des paramètres une fois connecté, ou par email à support@dailyplanning.com.
+                    Vous pouvez contacter notre équipe de support via la page des paramètres une fois connecté, ou par email à <a href="mailto:maxime.seignovert@gmail.com" className="text-primary hover:underline">maxime.seignovert@gmail.com</a>.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
