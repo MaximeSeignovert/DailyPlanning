@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from '@/lib/supabase';
 import { PenLine, Calendar as CalendarIcon, LineChart, BookOpen } from "lucide-react";
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import ReactMarkdown from 'react-markdown';
 import { useUser } from '@/contexts/UserContext';
 

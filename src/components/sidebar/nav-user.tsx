@@ -1,6 +1,6 @@
 "use client"
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '@tanstack/react-router';
 import {
   BadgeCheck,
   Bell,
@@ -34,7 +34,7 @@ import { useUser } from '@/contexts/UserContext';
 
 export function NavUser() {
   const { isMobile, setOpenMobile } = useSidebar()
-  const navigate = useNavigate()
+  const router = useRouter()
   const { userData, loading } = useUser()
 
   const handleLogout = async () => {
@@ -44,7 +44,7 @@ export function NavUser() {
       if (isMobile) {
         setOpenMobile(false);
       }
-      navigate('/auth')
+      router.navigate({ to: '/auth' })
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
     }

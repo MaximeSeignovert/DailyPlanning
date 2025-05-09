@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useMatches } from '@tanstack/react-router';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   BookOpen, 
@@ -21,7 +21,7 @@ import {
 import { NavUser } from '@/components/sidebar/nav-user';
 
 export function Sidebar() {
-  const location = useLocation();
+  const matches = useMatches();
   const { isMobile, setOpenMobile } = useSidebar();
   
   const links = [
@@ -37,6 +37,10 @@ export function Sidebar() {
     if (isMobile) {
       setOpenMobile(false);
     }
+  };
+
+  const isRouteActive = (path: string) => {
+    return matches.some(match => match.pathname === path);
   };
 
   return (
@@ -61,20 +65,23 @@ export function Sidebar() {
       <SidebarContent>
         <ScrollArea className="flex-1">
           <SidebarMenu>
-            {links.map(({ href, label, icon: Icon }) => (
-              <SidebarMenuItem key={href}>
-                <SidebarMenuButton
-                  asChild
-                  data-active={location.pathname === href}
-                  className={isMobile ? "py-6" : ""}
-                >
-                  <Link to={href} className="no-underline text-inherit" onClick={handleLinkClick}>
-                    <Icon className={isMobile ? "mx-2 size-6" : "mr-2 size-4"} />
-                    <span className={isMobile ? "text-lg" : ""}>{label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {links.map(({ href, label, icon: Icon }) => {
+              const isActive = isRouteActive(href);
+              return (
+                <SidebarMenuItem key={href}>
+                  <SidebarMenuButton
+                    asChild
+                    data-active={isActive}
+                    className={isMobile ? "py-6" : ""}
+                  >
+                    <Link to={href} className="no-underline text-inherit" onClick={handleLinkClick}>
+                      <Icon className={isMobile ? "mx-2 size-6" : "mr-2 size-4"} />
+                      <span className={isMobile ? "text-lg" : ""}>{label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </ScrollArea>
       </SidebarContent>

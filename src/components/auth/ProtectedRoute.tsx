@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '@tanstack/react-router';
 import { supabase } from '@/lib/supabase';
 import { useUser } from '@/contexts/UserContext';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { userData, loading } = useUser();
 
   useEffect(() => {
     const checkAuth = async () => {
       if (!loading && !userData) {
-        navigate('/auth');
+        router.navigate({ to: '/auth' });
       }
     };
 
@@ -18,14 +18,14 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
-        navigate('/auth');
+        router.navigate({ to: '/auth' });
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, userData, loading]);
+  }, [router, userData, loading]);
 
   if (loading) {
     return <div>Chargement...</div>;

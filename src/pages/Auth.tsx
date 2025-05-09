@@ -1,18 +1,18 @@
 import { AuthForm } from '@/components/auth/AuthForm';
 import { useUser } from '@/contexts/UserContext';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '@tanstack/react-router';
 
 export function Auth() {
   const { userData, loading } = useUser();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     // Si l'utilisateur est déjà connecté et que le chargement est terminé, rediriger vers le dashboard
     if (userData && !loading) {
-      navigate('/dashboard', { replace: true });
+      router.navigate({ to: '/dashboard', replace: true });
     }
-  }, [userData, loading, navigate]);
+  }, [userData, loading, router]);
 
   // Afficher un état de chargement pendant la vérification
   if (loading) {

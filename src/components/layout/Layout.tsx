@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useRouter } from '@tanstack/react-router';
 import { Sidebar } from './Sidebar';
 import { 
   SidebarInset, 
@@ -9,10 +9,11 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { ConnectionStatus } from "@/components/ui/connection-status";
 
 export function Layout() {
-  const location = useLocation();
+  const router = useRouter();
   
   const getPageTitle = () => {
-    switch (location.pathname) {
+    const path = router.state.location.pathname;
+    switch (path) {
       case '/dashboard':
         return 'Tableau de bord';
       case '/journal':
