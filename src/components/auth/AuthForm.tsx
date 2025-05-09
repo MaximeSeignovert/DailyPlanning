@@ -147,7 +147,7 @@ export function AuthForm() {
         });
         if (error) throw error;
       }
-      router.navigate({ to: '/dashboard' });
+      router.navigate({ to: '/app/dashboard' });
     } catch (error) {
       console.error('Erreur:', error);
     } finally {

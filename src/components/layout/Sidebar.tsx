@@ -25,12 +25,12 @@ export function Sidebar() {
   const { isMobile, setOpenMobile } = useSidebar();
   
   const links = [
-    { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
-    { href: '/journal', label: 'Journal', icon: BookOpen },
-    { href: '/calendar', label: 'Calendrier', icon: Calendar },
-    { href: '/analytics', label: 'Analytique', icon: LineChart },
-    { href: '/changelog', label: 'Changelog', icon: History },
-    { href: '/settings', label: 'Paramètres', icon: Settings },
+    { href: '/app/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+    { href: '/app/journal', label: 'Journal', icon: BookOpen },
+    { href: '/app/calendar', label: 'Calendrier', icon: Calendar },
+    { href: '/app/analytics', label: 'Analytique', icon: LineChart },
+    { href: '/app/changelog', label: 'Changelog', icon: History },
+    { href: '/app/settings', label: 'Paramètres', icon: Settings },
   ];
 
   const handleLinkClick = () => {
@@ -49,7 +49,7 @@ export function Sidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/dashboard" onClick={handleLinkClick}>
+              <Link to="/app/dashboard" onClick={handleLinkClick}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
                   <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Crayon/3D/crayon_3d.png" alt="Logo" className="size-8 drop-shadow-lg hover:rotate-180 transition-transform duration-300" />
                 </div>

@@ -18,14 +18,17 @@ export function Layout() {
     const path = location.pathname;
     const segments = path.split('/').filter(Boolean);
     
-    return segments.map((segment, index) => {
-      const currentPath = '/' + segments.slice(0, index + 1).join('/');
+    // Ignorer le premier segment 'app'
+    const relevantSegments = segments.slice(1);
+    
+    return relevantSegments.map((segment, index) => {
+      const currentPath = '/app/' + relevantSegments.slice(0, index + 1).join('/');
       const title = segment.charAt(0).toUpperCase() + segment.slice(1);
       
       return (
         <BreadcrumbItem key={currentPath}>
           <Link to={currentPath}>{title}</Link>
-          {index < segments.length - 1 && <BreadcrumbSeparator />}
+          {index < relevantSegments.length - 1 && <BreadcrumbSeparator />}
         </BreadcrumbItem>
       );
     });
@@ -35,7 +38,7 @@ export function Layout() {
     <SidebarProvider>
       <div className="flex h-screen w-full">
         <Sidebar />
-          <SidebarInset>
+          <SidebarInset className="border">
             <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
               <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1" />
@@ -50,7 +53,6 @@ export function Layout() {
             </header>
             <div className="h-[calc(100vh-4rem)] overflow-y-auto">
               <div className="w-full p-4 md:px-8">
-                <h1 className="text-2xl pb-4 font-bold">{location.pathname.split('/')[1].charAt(0).toUpperCase() + location.pathname.split('/')[1].slice(1)}</h1>
                 <Outlet />
               </div>
             </div>

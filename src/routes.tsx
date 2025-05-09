@@ -13,11 +13,19 @@ import { Analytics } from '@/pages/Analytics';
 import { Settings } from '@/pages/Settings';
 import { Changelog } from '@/pages/Changelog';
 import { Auth } from '@/pages/Auth';
+import Landing from '@/pages/Landing';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 // Définition de la route racine
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
+});
+
+// Route de la landing page
+const landingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: Landing,
 });
 
 // Route d'authentification
@@ -30,15 +38,15 @@ const authRoute = createRoute({
 // Route protégée avec layout
 const layoutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: '/app',
   component: () => (
     <ProtectedRoute>
       <Layout />
     </ProtectedRoute>
   ),
   beforeLoad: ({ location }) => {
-    if (location.pathname === '/') {
-      throw redirect({ to: '/dashboard' });
+    if (location.pathname === '/app') {
+      throw redirect({ to: '/app/dashboard' });
     }
   },
 });
@@ -82,6 +90,7 @@ const changelogRoute = createRoute({
 
 // Configuration du routeur
 const routeTree = rootRoute.addChildren([
+  landingRoute,
   authRoute,
   layoutRoute.addChildren([
     dashboardRoute,

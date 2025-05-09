@@ -10,7 +10,7 @@ export function Auth() {
   useEffect(() => {
     // Si l'utilisateur est déjà connecté et que le chargement est terminé, rediriger vers le dashboard
     if (userData && !loading) {
-      router.navigate({ to: '/dashboard', replace: true });
+      router.navigate({ to: '/app/dashboard', replace: true });
     }
   }, [userData, loading, router]);
 

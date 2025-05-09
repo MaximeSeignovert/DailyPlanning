@@ -125,7 +125,7 @@ export function Dashboard() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <Button asChild>
-          <Link to="/journal" className="gap-2">
+          <Link to="/app/journal" className="gap-2">
             <PenLine className="h-4 w-4" />
             Nouvelle entrée
           </Link>
@@ -170,7 +170,7 @@ export function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalActivities}</div>
+            <div className="font-sans text-2xl font-bold">{stats.totalActivities}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Depuis le début
             </p>
@@ -209,19 +209,19 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" asChild className="h-24 flex flex-col items-center justify-center">
-                <Link to="/journal">
+                <Link to="/app/journal">
                   <BookOpen className="h-6 w-6 mb-2" />
                   Journal
                 </Link>
               </Button>
               <Button variant="outline" asChild className="h-24 flex flex-col items-center justify-center">
-                <Link to="/calendar">
+                <Link to="/app/calendar">
                   <CalendarIcon className="h-6 w-6 mb-2" />
                   Calendrier
                 </Link>
               </Button>
               <Button variant="outline" asChild className="h-24 flex flex-col items-center justify-center">
-                <Link to="/analytics">
+                <Link to="/app/analytics">
                   <LineChart className="h-6 w-6 mb-2" />
                   Analytique
                 </Link>
