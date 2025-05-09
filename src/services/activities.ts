@@ -8,27 +8,9 @@ export interface Activity {
   user_id: string;
 }
 
-// Vérifier si l'application est en ligne
-function isOnline() {
-  return navigator.onLine;
-}
-
 export async function getActivity(date: Date, userId: string) {
   try {
-    if (!isOnline()) {
-      // Utiliser les données en cache si hors ligne
-      const cachedActivities = getCachedActivities();
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
-      
-      return cachedActivities.filter((activity: Activity) => {
-        const activityDate = new Date(activity.date);
-        return activityDate >= startOfDay && activityDate <= endOfDay;
-      });
-    }
-
+    
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);

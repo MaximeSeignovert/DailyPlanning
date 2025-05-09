@@ -30,7 +30,8 @@ export function DailyStandupView() {
     error: lastActivityError 
   } = useLastActivity(userData?.id) as { data: Activity | null, isLoading: boolean, error: unknown };
   
-
+  console.log('todayActivity', todayActivity);
+  console.log('lastActivity', lastActivity);
 
   const saveActivityMutation = useSaveActivity();
   
