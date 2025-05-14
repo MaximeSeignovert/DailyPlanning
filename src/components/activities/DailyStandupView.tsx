@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
-import { ActivityEditor } from "@/components/activities/ActivityEditor";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useUser } from '@/contexts/UserContext';
 import { useTodayActivity, useLastActivity, useSaveActivity } from '@/hooks/useActivities';
 import { Activity } from '@/services/activities';
+import { ActivityEditorModal } from './ActivityEditorModal';
 
 export function DailyStandupView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -111,7 +111,7 @@ export function DailyStandupView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[400px] pr-4">
+          <ScrollArea className="pr-4">
             {isLoadingLastActivity ? (
               <div className="space-y-2">
                 <Skeleton className="h-4 w-full" />
@@ -121,14 +121,6 @@ export function DailyStandupView() {
                 <Skeleton className="h-4 w-[75%]" />
                 <Skeleton className="h-10 w-[120px] mt-4" />
               </div>
-            ) : isEditingLastActivity ? (
-              <ActivityEditor
-                initialContent={lastActivity?.content || ''}
-                date={new Date(lastActivity?.date || new Date())}
-                onSave={handleSaveLastActivity}
-                onCancel={() => setIsEditingLastActivity(false)}
-                isSaving={saveActivityMutation.isPending}
-              />
             ) : (
               <div className="space-y-4">
                 <div className="prose prose-sm dark:prose-invert">
@@ -140,6 +132,16 @@ export function DailyStandupView() {
               </div>
             )}
           </ScrollArea>
+          
+          {/* Modal pour éditer la dernière activité */}
+          <ActivityEditorModal
+            isOpen={isEditingLastActivity}
+            onClose={() => setIsEditingLastActivity(false)}
+            initialContent={lastActivity?.content || ''}
+            date={new Date(lastActivity?.date || new Date())}
+            onSave={handleSaveLastActivity}
+            isSaving={saveActivityMutation.isPending}
+          />
         </CardContent>
       </Card>
       <Card>
@@ -158,14 +160,6 @@ export function DailyStandupView() {
               <Skeleton className="h-4 w-[80%]" />
               <Skeleton className="h-10 w-[120px] mt-4" />
             </div>
-          ) : isEditing ? (
-            <ActivityEditor
-              initialContent={todayActivity?.content || ''}
-              date={new Date()}
-              onSave={handleSaveToday}
-              onCancel={() => setIsEditing(false)}
-              isSaving={saveActivityMutation.isPending}
-            />
           ) : (
             <div className="space-y-4">
               <div className="prose prose-sm dark:prose-invert">
@@ -176,6 +170,16 @@ export function DailyStandupView() {
               </Button>
             </div>
           )}
+          
+          {/* Modal pour éditer l'activité du jour */}
+          <ActivityEditorModal
+            isOpen={isEditing}
+            onClose={() => setIsEditing(false)}
+            initialContent={todayActivity?.content || ''}
+            date={new Date()}
+            onSave={handleSaveToday}
+            isSaving={saveActivityMutation.isPending}
+          />
         </CardContent>
       </Card>
     </div>

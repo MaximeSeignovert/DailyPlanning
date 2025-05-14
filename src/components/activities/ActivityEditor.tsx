@@ -50,13 +50,13 @@ export function ActivityEditor({ initialContent, onSave, onCancel, isSaving = fa
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
       <Textarea
         placeholder="Écrivez vos activités en markdown..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-h-[200px] md:h-[500px] flex-1 font-mono whitespace-pre"
+        className="min-h-[200px] flex-1 font-mono whitespace-pre h-full resize-none"
       />
       <div className="flex gap-2">
         <Button onClick={handleSave} disabled={isSaving}>
