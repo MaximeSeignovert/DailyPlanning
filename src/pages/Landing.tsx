@@ -16,21 +16,29 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto px-4 py-8">
-        <header className="py-6">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
+        <header className="py-4 sm:py-6">
           <nav className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <span className="text-3xl font-bold text-primary">DailyPlanning</span>
+              <span className="text-2xl sm:text-3xl font-bold text-primary">DailyPlanning</span>
               <Badge variant="outline" className="ml-2">Beta</Badge>
-              
             </div>
-            <div className="flex items-center space-x-4">
+            
+            {/* Navigation desktop */}
+            <div className="hidden md:flex items-center space-x-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -56,24 +64,60 @@ export default function Landing() {
               </Button>
               <ThemeToggle />
             </div>
+            
+            {/* Bouton menu mobile */}
+            <div className="flex md:hidden items-center space-x-4">
+              <ThemeToggle />
+              <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </nav>
+          
+          {/* Menu mobile déroulant */}
+          {mobileMenuOpen && (
+            <div className="mt-4 py-4 bg-background border border-border rounded-lg md:hidden">
+              <div className="flex flex-col space-y-3 px-4">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-foreground hover:text-primary hover:bg-background"
+                  onClick={() => {
+                    navigate({ to: "/auth" });
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Se connecter
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                  onClick={() => {
+                    navigate({ to: "/auth" });
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  S'inscrire
+                </Button>
+              </div>
+            </div>
+          )}
         </header>
 
         <main>
-          <section className="py-20 flex flex-col items-center text-center">
+          <section className="py-12 sm:py-20 flex flex-col items-center text-center">
             <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20 border-none">
               Découvrez notre nouvel outil
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 text-foreground">
               Planifiez votre <span className="text-primary">quotidien</span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl">
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-2xl px-2">
               Organisez vos tâches journalières, suivez vos objectifs et maximisez votre productivité avec notre outil de planification intelligent.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 w-full px-4 sm:px-0 sm:w-auto">
               <Button
                 size="lg"
-                className="cursor-pointer text-lg px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90"
+                className="cursor-pointer text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => navigate({ to: "/auth" })}
               >
                 Commencer gratuitement
@@ -81,7 +125,7 @@ export default function Landing() {
               <Button
                 size="lg"
                 variant="outline"
-                className="cursor-pointer text-lg px-8 py-6 border-primary text-primary hover:bg-primary/10"
+                className="cursor-pointer text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-primary text-primary hover:bg-primary/10"
                 onClick={() => window.scrollTo({ top: document.getElementById('features')?.offsetTop, behavior: 'smooth' })}
               >
                 Découvrir les fonctionnalités
@@ -89,15 +133,15 @@ export default function Landing() {
             </div>
           </section>
 
-          <Separator className="my-8" />
+          <Separator className="my-6 sm:my-8" />
 
-          <section id="features" className="py-16">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 text-foreground">Fonctionnalités principales</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">Toutes les fonctionnalités dont vous avez besoin pour une planification efficace.</p>
+          <section id="features" className="py-10 sm:py-16">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-foreground">Fonctionnalités principales</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto px-4 sm:px-0">Toutes les fonctionnalités dont vous avez besoin pour une planification efficace.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 w-full px-4 sm:px-0">
               <Card className="bg-card text-card-foreground border-border shadow-xs hover:shadow-sm transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold text-primary">Planning Intelligent</CardTitle>
@@ -127,18 +171,18 @@ export default function Landing() {
             </div>
           </section>
 
-          <Separator className="my-8" />
+          <Separator className="my-6 sm:my-8" />
 
-          <section className="py-16">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 text-foreground">Questions fréquentes</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">Tout ce que vous devez savoir pour commencer.</p>
+          <section className="py-10 sm:py-16">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-foreground">Questions fréquentes</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto px-4 sm:px-0">Tout ce que vous devez savoir pour commencer.</p>
             </div>
             
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto px-4 sm:px-0">
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-foreground hover:text-primary">
+                  <AccordionTrigger className="text-foreground hover:text-primary text-left">
                     Comment commencer avec DailyPlanning ?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
@@ -147,7 +191,7 @@ export default function Landing() {
                 </AccordionItem>
 
                 <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-foreground hover:text-primary">
+                  <AccordionTrigger className="text-foreground hover:text-primary text-left">
                     Est-ce que DailyPlanning est gratuit ?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
@@ -156,7 +200,7 @@ export default function Landing() {
                 </AccordionItem>
 
                 <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-foreground hover:text-primary">
+                  <AccordionTrigger className="text-foreground hover:text-primary text-left">
                     Comment contacter le support ?
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
@@ -168,7 +212,7 @@ export default function Landing() {
           </section>
         </main>
 
-        <footer className="py-8 mt-16 border-t border-border">
+        <footer className="py-6 sm:py-8 mt-10 sm:mt-16 border-t border-border">
           <div className="text-center text-muted-foreground">
             <p>&copy; {new Date().getFullYear()} DailyPlanning. Tous droits réservés.</p>
           </div>
