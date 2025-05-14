@@ -1,5 +1,6 @@
 import { Link, Outlet } from '@tanstack/react-router';
 import { Sidebar } from './Sidebar';
+import { MobileNav } from './MobileNav';
 import { 
   SidebarInset, 
   SidebarProvider, 
@@ -51,13 +52,14 @@ export function Layout() {
               </div>
               <ThemeToggle />
             </header>
-            <div className="h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="h-[calc(100vh-4rem)] pb-16 md:pb-0 overflow-y-auto">
               <div className="w-full p-4 md:px-8">
                 <Outlet />
               </div>
             </div>
           </SidebarInset>
       </div>
+      <MobileNav />
       <ConnectionStatus />
     </SidebarProvider>
   );
