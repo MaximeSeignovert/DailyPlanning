@@ -216,6 +216,7 @@ export function AuthForm() {
             <form onSubmit={handleAuth} className="space-y-4">
               <Input
                 type="email"
+                autoComplete="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -223,6 +224,7 @@ export function AuthForm() {
               />
               <Input
                 type="password"
+                autoComplete="current-password"
                 placeholder="Mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
