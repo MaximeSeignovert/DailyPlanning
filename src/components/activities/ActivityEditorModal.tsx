@@ -14,8 +14,6 @@ interface ActivityEditorModalProps {
   onClose: () => void;
   initialContent: string;
   date: Date;
-  onSave: (content: string) => void;
-  isSaving?: boolean;
 }
 
 export function ActivityEditorModal({
@@ -23,13 +21,7 @@ export function ActivityEditorModal({
   onClose,
   initialContent,
   date,
-  onSave,
-  isSaving = false,
 }: ActivityEditorModalProps) {
-  const handleSave = (content: string) => {
-    onSave(content);
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-[90vw] max-w-[90vw] max-h-[90vh] h-[90vh] md:h-[80vh] overflow-hidden flex flex-col">
@@ -41,9 +33,6 @@ export function ActivityEditorModal({
           <ActivityEditor 
             initialContent={initialContent}
             date={date}
-            onSave={handleSave}
-            onCancel={onClose}
-            isSaving={isSaving}
           />
         </div>
       </DialogContent>

@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/use-toast";
 import { useUser } from '@/contexts/UserContext';
-import { useTodayActivity, useLastActivity, useSaveActivity } from '@/hooks/useActivities';
+import { useTodayActivity, useLastActivity } from '@/hooks/useActivities';
 import { Activity } from '@/services/activities';
 import { ActivityEditorModal } from './ActivityEditorModal';
 
@@ -30,76 +29,14 @@ export function DailyStandupView() {
     error: lastActivityError 
   } = useLastActivity(userData?.id) as { data: Activity | null, isLoading: boolean, error: unknown };
   
-  console.log('todayActivity', todayActivity);
-  console.log('lastActivity', lastActivity);
-
-  const saveActivityMutation = useSaveActivity();
-  
   // Afficher les erreurs si nécessaire
   if (todayError) {
-    toast({
-      title: "Erreur",
-      description: "Impossible de charger l'activité du jour.",
-      variant: "destructive",
-    });
+    console.error('Erreur lors de la récupération de l\'activité du jour.');
   }
   
   if (lastActivityError) {
-    toast({
-      title: "Erreur",
-      description: "Impossible de charger la dernière activité.",
-      variant: "destructive",
-    });
+    console.error('Erreur lors de la récupération de la dernière activité.');
   }
-  
-  const handleSaveToday = async (content: string) => {
-    if (!userData) return;
-    
-    try {
-      await saveActivityMutation.mutateAsync({
-        content,
-        date: new Date(),
-        userId: userData.id
-      });
-      
-      setIsEditing(false);
-      toast({
-        title: "Enregistré !",
-        description: "Votre activité du jour a été enregistrée avec succès.",
-      });
-    } catch {
-      toast({
-        title: "Erreur",
-        description: "Échec de l'enregistrement de l'activité du jour.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSaveLastActivity = async (content: string) => {
-    if (!userData || !lastActivity) return;
-    
-    try {
-      await saveActivityMutation.mutateAsync({
-        content,
-        date: new Date(lastActivity.date),
-        userId: userData.id
-      });
-      
-      setIsEditingLastActivity(false);
-      toast({
-        title: "Enregistré !",
-        description: "La dernière activité a été mise à jour avec succès.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la dernière activité:', error);
-      toast({
-        title: "Erreur",
-        description: "Échec de la mise à jour de la dernière activité.",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -139,8 +76,6 @@ export function DailyStandupView() {
             onClose={() => setIsEditingLastActivity(false)}
             initialContent={lastActivity?.content || ''}
             date={new Date(lastActivity?.date || new Date())}
-            onSave={handleSaveLastActivity}
-            isSaving={saveActivityMutation.isPending}
           />
         </CardContent>
       </Card>
@@ -177,8 +112,6 @@ export function DailyStandupView() {
             onClose={() => setIsEditing(false)}
             initialContent={todayActivity?.content || ''}
             date={new Date()}
-            onSave={handleSaveToday}
-            isSaving={saveActivityMutation.isPending}
           />
         </CardContent>
       </Card>
